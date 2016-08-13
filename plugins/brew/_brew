@@ -1,11 +1,9 @@
 #compdef brew
 #autoload
 
-# imported from https://github.com/Homebrew/homebrew/blob/29f73d2212c2b202fe25f69dcbf440d8391fa4c9/Library/Contributions/brew_zsh_completion.zsh
+# imported from https://github.com/Homebrew/brew/blob/b7dc6ce7ee0fe580b382bec9859fa1b6129e7930/share/zsh/site-functions/_brew
 
 # Brew ZSH completion function
-# Drop this somewhere in your $fpath (like /usr/share/zsh/site-functions)
-# and rename it _brew
 #
 # altered from _fink
 
@@ -100,6 +98,7 @@ if (( CURRENT == 1 )); then
 fi
 
 case "$words[1]" in
+  analytics) compadd on off state regenerate-uuid ;;
   install|reinstall|audit|home|homepage|log|info|abv|uses|cat|deps|desc|edit|options|switch)
     _brew_all_formulae
     _wanted formulae expl 'all formulae' compadd -a formulae ;;
@@ -140,6 +139,13 @@ case "$words[1]" in
     _brew_pinned_taps
     _wanted pinned_taps expl 'pinned taps' compadd -a pinned_taps ;;
   upgrade)
-    _brew_outdated_formulae
-    _wanted outdated_formulae expl 'outdated formulae' compadd -a outdated_formulae ;;
+    _arguments \
+      '(--cleanup)--cleanup[remove previously installed formula version(s)]' \
+      '(--fetch-HEAD)--fetch-HEAD[detect outdated installation by fetching the repo]' \
+      '1: :->forms' && return 0
+
+    if [[ "$state" == forms ]]; then
+      _brew_outdated_formulae
+      _wanted outdated_formulae expl 'outdated formulae' compadd -a outdated_formulae
+    fi ;;
 esac
